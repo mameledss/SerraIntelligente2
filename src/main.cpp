@@ -5,30 +5,32 @@
 #include "../include/ImpiantoTropicale.h"
 #include "../include/ImpiantoDesertico.h"
 
+using namespace std;
+
 void stampaIntroduzione() {
-    std::cout << "==================================================================" << std::endl;
-    std::cout << "        SISTEMA DI GESTIONE SERRA INTELLIGENTE" << std::endl;
-    std::cout << "==================================================================" << std::endl;
-    std::cout << "Comandi disponibili:" << std::endl;
-    std::cout << "  - set [nome_impianto] on       : Accendi manualmente un impianto" << std::endl;
-    std::cout << "  - set [nome_impianto] off      : Spegni manualmente un impianto" << std::endl;
-    std::cout << "  - set [nome_impianto] [HH:MM] [HH:MM] : Imposta timer di accensione/spegnimento" << std::endl;
-    std::cout << "  - rm [nome_impianto]           : Rimuovi un timer" << std::endl;
-    std::cout << "  - show                         : Mostra tutti gli impianti" << std::endl;
-    std::cout << "  - show [nome_impianto]         : Mostra dettagli di un impianto" << std::endl;
-    std::cout << "  - set time [HH:MM]             : Imposta l'orario di sistema" << std::endl;
-    std::cout << "  - reset time                   : Ripristina l'orario a 00:00" << std::endl;
-    std::cout << "  - reset timers                 : Rimuovi tutti i timer" << std::endl;
-    std::cout << "  - reset all                    : Ripristina condizioni iniziali" << std::endl;
-    std::cout << "  - exit                         : Esci dal programma" << std::endl;
-    std::cout << "==================================================================" << std::endl;
-    std::cout << "Orario attuale: 00:00" << std::endl;
+    cout << "==================================================================" << endl;
+    cout << "        SISTEMA DI GESTIONE SERRA INTELLIGENTE" << endl;
+    cout << "==================================================================" << endl;
+    cout << "Comandi disponibili:" << endl;
+    cout << "  - set [nome_impianto] on       : Accendi manualmente un impianto" << endl;
+    cout << "  - set [nome_impianto] off      : Spegni manualmente un impianto" << endl;
+    cout << "  - set [nome_impianto] [HH:MM] [HH:MM] : Imposta timer di accensione/spegnimento" << endl;
+    cout << "  - rm [nome_impianto]           : Rimuovi un timer" << endl;
+    cout << "  - show                         : Mostra tutti gli impianti" << endl;
+    cout << "  - show [nome_impianto]         : Mostra dettagli di un impianto" << endl;
+    cout << "  - set time [HH:MM]             : Imposta l'orario di sistema" << endl;
+    cout << "  - reset time                   : Ripristina l'orario a 00:00" << endl;
+    cout << "  - reset timers                 : Rimuovi tutti i timer" << endl;
+    cout << "  - reset all                    : Ripristina condizioni iniziali" << endl;
+    cout << "  - exit                         : Esci dal programma" << endl;
+    cout << "==================================================================" << endl;
+    cout << "Orario attuale: 00:00" << endl;
 }
 
 int main() {
     Serra serra;
     CommandParser parser(serra);
-    std::string comando;
+    string comando;
 
     // Aggiungi alcuni impianti predefiniti
     serra.aggiungiImpianto("Tropicale", "PalmaDaCocco");
@@ -37,8 +39,8 @@ int main() {
     stampaIntroduzione();
 
     while (true) {
-        std::cout << "\n> ";
-        std::getline(std::cin, comando);
+        cout << "\n> ";
+        getline(cin, comando);
 
         if (comando == "exit") {
             break;
@@ -47,7 +49,7 @@ int main() {
         parser.elaboraComando(comando);
     }
 
-    std::cout << "Arrivederci!" << std::endl;
+    cout << "Arrivederci!" << endl;
 
     return 0;
 }

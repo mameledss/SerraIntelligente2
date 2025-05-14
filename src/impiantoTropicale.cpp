@@ -2,6 +2,8 @@
 #include <sstream>
 #include <iomanip>
 
+using namespace std;
+
 ImpiantoTropicale::ImpiantoTropicale(int id, const std::string& nome)
     : Impianto(id, nome, 0.5f) { // Consumo di 0.5 litri al minuto
 }
