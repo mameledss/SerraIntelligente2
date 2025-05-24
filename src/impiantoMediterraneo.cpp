@@ -1,8 +1,8 @@
-#include "ImpiantoMediterraneo.h"
 #include <sstream>
 #include <iomanip>
 #include <cstdlib> // Per rand() e srand()
 #include <ctime>   // Per time()
+#include "ImpiantoMediterraneo.h"
 
 ImpiantoMediterraneo::ImpiantoMediterraneo(int id, const string& nome)
     : Impianto(id, nome, 0.4f), temperatura(28.0f) {
@@ -26,7 +26,6 @@ void ImpiantoMediterraneo::aggiornaStato(const Orario& orarioPrecedente, const O
     if (minutiTrascorsi <= 0) {
         return;
     }
-
     bool statoIniziale = attivo;
 
     if (!attivo) {
@@ -41,7 +40,6 @@ void ImpiantoMediterraneo::aggiornaStato(const Orario& orarioPrecedente, const O
             spegni(orarioCorrente);
         }
     }
-
     if (attivo && statoIniziale && orarioPrecedente != orarioCorrente) {
         aggiornaConsumo(minutiTrascorsi);
     }

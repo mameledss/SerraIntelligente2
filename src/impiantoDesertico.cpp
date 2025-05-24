@@ -1,7 +1,8 @@
-#include "ImpiantoDesertico.h"
 #include <sstream>
 #include <iomanip>
 #include <iostream>
+#include "CommandParser.h"
+#include "ImpiantoDesertico.h"
 
 ImpiantoDesertico::ImpiantoDesertico(int id, const string& nome)
     : Impianto(id, nome, 0.3f) { // Consumo di 0.3 litri al minuto
@@ -17,7 +18,7 @@ bool ImpiantoDesertico::impostaTimer2(const Orario& inizio) {
     // Per l'impianto desertico, timer semplice significa accensione all'infinito
     // Impostiamo un orario di fine molto lontano (23:59) per simulare l'infinito
     timerIntervallo = TimerIntervallo(inizio, Orario(23, 59));
-    cout << inizio.format() << " Timer impostato per \"" << nome << "\"" << endl;
+    logMessage(inizio, " Timer impostato per \"" + nome + "\"", 0);
     return true;
 }
 
@@ -33,7 +34,6 @@ void ImpiantoDesertico::aggiornaStato(const Orario& orarioPrecedente, const Orar
     if (!timerIntervallo.has_value()) {
         return; // Nessun timer impostato
     }
-
     // Verifica lo stato all'orario corrente
     bool dovrebbeEssereAttivoOra = dovrebbeEssereAttivo(orarioCorrente);
 
@@ -67,7 +67,6 @@ string ImpiantoDesertico::getInfo() const {
     oss << "  Stato: " << (attivo ? "Attivo" : "Disattivo") << endl;
     oss << "  Ultima attivazione: " << (attivo ? ultimaAttivazione.toString() : "Mai") << endl;
     oss << "  Consumo totale: " << fixed << setprecision(2) << consumoTotale << " litri" << endl;
-    oss << "  Timer: " << (timerIntervallo.has_value() ? timerIntervallo.value() : "Non impostato") << endl;
     return oss.str();
 }
 
@@ -75,11 +74,9 @@ bool ImpiantoDesertico::dovrebbeEssereAttivo(const Orario& orario) const {
     if (!timerIntervallo.has_value()) {
         return false;
     }
-
     // Se l'orario di fine è 23:59, consideriamo che l'impianto rimane acceso fino alla fine del giorno
     if (timerIntervallo->fine.getOre() == 23 && timerIntervallo->fine.getMinuti() == 59) {
         return orario >= timerIntervallo->inizio;
     }
-    
     return orario.isDentroIntervallo(timerIntervallo->inizio, timerIntervallo->fine);
 }

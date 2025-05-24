@@ -6,6 +6,8 @@
 #include "Serra.h"
 using namespace std;
 
+void logMessage(const Orario &time, const string &message, const int &errorLevel);
+
 class CommandParser {
 private:
     Serra& serra;

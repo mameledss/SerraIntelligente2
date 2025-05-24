@@ -1,6 +1,6 @@
-#include "Orario.h"
 #include <iomanip>
 #include <sstream>
+#include "Orario.h"
 
 Orario::Orario() : ore(0), minuti(0) {}
 

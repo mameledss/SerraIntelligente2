@@ -1,6 +1,7 @@
-#include "ImpiantoAlpino.h"
 #include <sstream>
 #include <iomanip>
+#include "CommandParser.h"
+#include "ImpiantoAlpino.h"
 
 ImpiantoAlpino::ImpiantoAlpino(int id, const string& nome)
     : Impianto(id, nome, 0.5f) { // Consumo di 0.5 litri al minuto
@@ -14,7 +15,7 @@ bool ImpiantoAlpino::impostaTimer(const Orario& inizio, const Orario& fine) {
 
 bool ImpiantoAlpino::impostaTimer2(const Orario& inizio) {
     orarioTimer = inizio;
-    cout << inizio.format() << " Timer impostato per \"" << nome << "\"" << endl;
+    logMessage(inizio, " Timer impostato per \"" + nome + "\"", 0);
     return true;
 }
 
@@ -87,7 +88,6 @@ Orario ImpiantoAlpino::calcolaOrarioSpegnimento() const {
     int durataIrrigazione = 150; // 2 ore e 30 minuti = 150 minuti
     int oreAggiuntive = durataIrrigazione / 60;
     int minutiAggiuntivi = durataIrrigazione % 60;
-
     int nuoveOre = (orarioTimer.value().getOre() + oreAggiuntive) % 24;
     int nuoviMinuti = (orarioTimer.value().getMinuti() + minutiAggiuntivi) % 60;
 
@@ -95,6 +95,5 @@ Orario ImpiantoAlpino::calcolaOrarioSpegnimento() const {
     if (orarioTimer.value().getMinuti() + minutiAggiuntivi >= 60) {
         nuoveOre = (nuoveOre + 1) % 24;
     }
-
     return Orario(nuoveOre, nuoviMinuti);
 }

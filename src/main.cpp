@@ -2,7 +2,6 @@
 #include <string>
 #include "Serra.h"
 #include "CommandParser.h"
-
 using namespace std;
 
 void stampaIntroduzione() {
@@ -37,7 +36,6 @@ int main() {
     serra.aggiungiImpianto("Carnivoro", "Carnivoro");
     serra.aggiungiImpianto("Alpino", "Alpino");
     serra.aggiungiImpianto("Mediterraneo", "Mediterraneo");
-
     stampaIntroduzione();
 
     while (true) {
@@ -47,11 +45,8 @@ int main() {
         if (comando == "exit") {
             break;
         }
-
         parser.elaboraComando(comando);
     }
-
     cout << "Arrivederci!" << endl;
-
     return 0;
 }

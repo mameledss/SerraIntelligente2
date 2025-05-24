@@ -1,8 +1,8 @@
-#include "Serra.h"
-#include "CommandParser.h"
 #include <iostream>
 #include <algorithm>
 #include <iomanip>
+#include "Serra.h"
+#include "CommandParser.h"
 using namespace std;
 
 Serra::Serra() : orarioCorrente(0, 0), prossimoIdImpianto(1) {}
@@ -16,20 +16,20 @@ Serra::~Serra() {
 
 bool Serra::aggiungiImpianto(const string& tipo, const string& nome) {
     if (trovaImpianto(nome) != nullptr) {
-        cout << "Errore: Esiste già un impianto con il nome \"" << nome << "\"" << endl;
+        logMessage(orarioCorrente, "Errore: Esiste gia' un impianto con il nome \"" + nome + "\"", 1);
         return false;
     }
 
     Impianto* nuovoImpianto = Impianto::creaImpianto(prossimoIdImpianto, tipo, nome);
     if (!nuovoImpianto) {
-        cout << "Errore: Tipo di impianto \"" << tipo << "\" non riconosciuto" << endl;
+        logMessage(orarioCorrente, "Errore: Tipo di impianto \"" + tipo + "\" non riconosciuto", 1);
         return false;
     }
 
     impianti.push_back(nuovoImpianto);
     prossimoIdImpianto++;
 
-    cout << "Impianto \"" << nome << "\" aggiunto con successo" << endl;
+    logMessage(orarioCorrente, "Impianto \"" + nome + "\" aggiunto con successo", 0);
     return true;
 }
 
@@ -43,11 +43,11 @@ bool Serra::rimuoviImpianto(const string& nome) {
         Impianto* impiantoDaRimuovere = *it;
         impianti.erase(it);
         delete impiantoDaRimuovere;
-        cout << "Impianto \"" << nome << "\" rimosso con successo" << endl;
+        logMessage(orarioCorrente, "Impianto \"" + nome + "\" rimosso con successo", 0);
         return true;
     }
 
-    cout << "Errore: Impianto \"" << nome << "\" non trovato" << endl;
+    logMessage(orarioCorrente, "Impianto \"" + nome + "\" rimosso con successo", 0);
     return false;
 }
 
@@ -62,23 +62,21 @@ bool Serra::rimuoviImpianto(int id) {
         Impianto* impiantoDaRimuovere = *it;
         impianti.erase(it);
         delete impiantoDaRimuovere;
-        cout << "Impianto \"" << nome << "\" rimosso con successo" << endl;
+        logMessage(orarioCorrente, "Impianto \"" + nome + "\" rimosso con successo", 0);
         return true;
     }
-
-    cout << "Errore: Impianto con ID " << id << " non trovato" << endl;
+    logMessage(orarioCorrente,"Errore: Impianto con ID " + to_string(id) + " non trovato" , 1);
     return false;
 }
 
 bool Serra::accendiImpianto(const string& nome) {
     Impianto* impianto = trovaImpianto(nome);
     if (!impianto) {
-        cout << "Errore: Impianto \"" << nome << "\" non trovato" << endl;
+        logMessage(orarioCorrente, "Errore: Impianto \"" + nome + "\" non trovato", 1);
         return false;
     }
-
     if (impianto->isAttivo()) {
-        cout << "Impianto \"" << nome << "\" è già acceso" << endl;
+        logMessage(orarioCorrente, "Impianto \"" + nome + "\" è già acceso", 1);
         return true;
     }
 
@@ -88,7 +86,7 @@ bool Serra::accendiImpianto(const string& nome) {
 bool Serra::accendiImpiantoOn(const string& nome) {
     Impianto* impianto = trovaImpianto(nome);
     if (!impianto) {
-        cout << "Errore: Impianto \"" << nome << "\" non trovato" << endl;
+        logMessage(orarioCorrente, "Errore: Impianto \"" + nome + "\" non trovato", 1);
         return false;
     }
 
@@ -118,12 +116,12 @@ bool Serra::accendiImpiantoOn(const string& nome) {
 bool Serra::spegniImpianto(const string& nome) {
     Impianto* impianto = trovaImpianto(nome);
     if (!impianto) {
-        cout << "Errore: Impianto \"" << nome << "\" non trovato" << endl;
+        logMessage(orarioCorrente, "Errore: Impianto \"" + nome + "\" non trovato", 1);
         return false;
     }
 
     if (!impianto->isAttivo()) {
-        cout << "Impianto \"" << nome << "\" è già spento" << endl;
+        logMessage(orarioCorrente, "Impianto \"" + nome + "\" è già spento", 1);
         return true;
     }
 
@@ -138,7 +136,7 @@ bool Serra::spegniImpianto(const string& nome) {
 bool Serra::impostaTimer(const string& nome, const Orario& inizio, const Orario& fine) {
     Impianto* impianto = trovaImpianto(nome);
     if (!impianto) {
-        cout << "Errore: Impianto \"" << nome << "\" non trovato" << endl;
+        logMessage(orarioCorrente, "Errore: Impianto \"" + nome + "\" non trovato", 1);
         return false;
     }
 
@@ -148,14 +146,13 @@ bool Serra::impostaTimer(const string& nome, const Orario& inizio, const Orario&
     bool isCarnivoro = info.find("Carnivoro") != string::npos;
 
     if (isTropicale || isCarnivoro || isAlpino) {
-        cout << "Errore: Gli impianti automatici non supportano timer con intervallo specifico" << endl;
+        logMessage(orarioCorrente, "Errore: Gli impianti automatici non supportano timer con intervallo specifico", 1);
         return false;
     }
-
     if (impianto->impostaTimer(inizio, fine)) {
         return true;
     } else {
-        cout << "Errore: Impossibile impostare il timer per l'impianto \"" << nome << "\"" << endl;
+        logMessage(orarioCorrente, "Errore: Impossibile impostare il timer per l'impianto \"" + nome + "\"", 1);
         return false;
     }
 }
@@ -163,14 +160,13 @@ bool Serra::impostaTimer(const string& nome, const Orario& inizio, const Orario&
 bool Serra::impostaTimer2(const string& nome, const Orario& inizio) {
     Impianto* impianto = trovaImpianto(nome);
     if (!impianto) {
-        cout << "Errore: Impianto \"" << nome << "\" non trovato" << endl;
+        logMessage(orarioCorrente, "Errore: Impianto \"" + nome + "\" non trovato", 1);
         return false;
     }
-
     if (impianto->impostaTimer2(inizio)) {
         return true;
     } else {
-        cout << "Errore: Impossibile impostare il timer per l'impianto \"" << nome << "\"" << endl;
+        logMessage(orarioCorrente, "Errore: Impossibile impostare il timer per l'impianto \"" + nome + "\"", 1);
         return false;
     }
 }
@@ -178,28 +174,26 @@ bool Serra::impostaTimer2(const string& nome, const Orario& inizio) {
 bool Serra::rimuoviTimer(const string& nome) {
     Impianto* impianto = trovaImpianto(nome);
     if (!impianto) {
-        cout << "Errore: Impianto \"" << nome << "\" non trovato" << endl;
+        logMessage(orarioCorrente, "Errore: Impianto \"" + nome + "\" non trovato", 1);
         return false;
     }
-
     if (impianto->rimuoviTimer()) {
-        cout << "[" << orarioCorrente.format() << "] Timer rimosso per \"" << nome << "\"" << endl;
+        logMessage(orarioCorrente, "Timer rimosso per \"" + nome + "\"", 0);
         return true;
     } else {
-        cout << "Errore: Nessun timer impostato per l'impianto \"" << nome << "\"" << endl;
+        logMessage(orarioCorrente, "Errore: Nessun timer impostato per l'impianto \"" + nome + "\"", 1);
         return false;
     }
 }
 
 void Serra::setOrario(const Orario& nuovoOrario) {
     if (nuovoOrario < orarioCorrente) {
-        cout << "Errore: Non è possibile impostare un orario precedente a quello attuale" << endl;
+        logMessage(orarioCorrente, "Errore: Non e' possibile impostare un orario precedente a quello attuale", 1);
         return;
     }
-
     aggiornaStatiImpianti(nuovoOrario);
     orarioCorrente = nuovoOrario;
-    cout << orarioCorrente.format() << " L'orario attuale è " << orarioCorrente.format() << endl;
+    logMessage(orarioCorrente, " L'orario attuale e' " + orarioCorrente.format(), 0);
 }
 
 Orario Serra::getOrarioCorrente() const {
@@ -215,15 +209,14 @@ void Serra::resetOrario() {
     }
 
     orarioCorrente = Orario(0, 0);
-    cout << orarioCorrente.format() << " Orario reimpostato a " << orarioCorrente.format() << endl;
+    logMessage(orarioCorrente, " Orario reimpostato a " + orarioCorrente.format(), 0);
 }
 
 void Serra::resetTimers() {
     for (auto impianto : impianti) {
         impianto->rimuoviTimer();
     }
-
-    cout << orarioCorrente.format() << " Tutti i timer sono stati rimossi" << endl;
+    logMessage(orarioCorrente, " Tutti i timer sono stati rimossi", 0);
 }
 
 void Serra::resetAll() {
@@ -233,18 +226,16 @@ void Serra::resetAll() {
         }
         impianto->rimuoviTimer();
     }
-
     orarioCorrente = Orario(0, 0);
-    cout << orarioCorrente.format() << " Sistema reimpostato completamente" << endl;
+    logMessage(orarioCorrente, " Sistema reimpostato completamente", 0);
 }
 
 void Serra::mostraStato() const {
     if (impianti.empty()) {
-        cout << "Nessun impianto presente nella serra" << endl;
+        logMessage(orarioCorrente, "Nessun impianto presente nella serra", 1);
         return;
     }
-
-    cout << "Stato attuale degli impianti (orario: " << orarioCorrente.format() << "):" << endl;
+    logMessage(orarioCorrente, "Stato attuale degli impianti", 0);
     cout << "--------------------------------------------------------" << endl;
     cout << left << setw(5) << "ID"
          << setw(15) << "Nome"
@@ -266,7 +257,6 @@ void Serra::mostraStato() const {
              << setw(10) << (impianto->isAttivo() ? "Acceso" : "Spento")
              << setw(20) << fixed << setprecision(2) << impianto->getConsumoTotale() << endl;
     }
-
     cout << "--------------------------------------------------------" << endl;
 }
 
@@ -275,12 +265,10 @@ void Serra::mostraImpianto(const string& nome) const {
                       [&nome](const Impianto* imp) {
                           return imp->getNome() == nome;
                       });
-
     if (it == impianti.end()) {
-        cout << "Errore: Impianto \"" << nome << "\" non trovato" << endl;
+        logMessage(orarioCorrente, "Errore: Impianto \"" + nome + "\" non trovato", 1);
         return;
     }
-
     const auto impianto = *it;
     cout << "Dettagli impianto:" << endl;
     cout << "ID: " << impianto->getId() << endl;
@@ -294,7 +282,6 @@ void Serra::mostraImpianto(const string& nome) const {
     } else {
         cout << "Mai" << endl;
     }
-
     cout << "Consumo totale: " << fixed << setprecision(2) << impianto->getConsumoTotale() << " litri" << endl;
 }
 
@@ -329,7 +316,6 @@ void Serra::aggiornaStatiImpianti(const Orario& nuovoOrario) {
             nuoviMinuti = 0;
             nuoveOre = (nuoveOre + 1) % 24;
         }
-
         orarioSimulato = Orario(nuoveOre, nuoviMinuti);
 
         for (auto impianto : impianti) {

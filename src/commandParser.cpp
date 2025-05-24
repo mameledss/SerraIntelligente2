@@ -4,7 +4,12 @@
 #include "Orario.h"
 
 CommandParser::CommandParser(Serra& serra) : serra(serra) {}
-
+void logMessage(const Orario &time, const string &message, const int &errorLevel) {
+    if (errorLevel == 0)
+        cout << "[" << time.toString() << "] " << message << endl;
+    else if (errorLevel == 1)
+        cerr << "[" << time.toString() << "] " << message << endl;
+}
 bool CommandParser::elaboraComando(const string& comandoCompleto) {
     vector<string> tokens = tokenizzaComando(comandoCompleto); //suddivide comando in token
     if (tokens.empty()) {
@@ -21,7 +26,7 @@ bool CommandParser::elaboraComando(const string& comandoCompleto) {
     } else if (tipoComando == "reset") {
         return gestisciComandoReset(tokens);
     } else {
-        cout << "Comando non riconosciuto" << endl;
+        cerr << "Comando non riconosciuto" << endl;
         return false;
     }
 }
@@ -30,7 +35,6 @@ vector<string> CommandParser::tokenizzaComando(const string& comandoCompleto) {
     vector<string> tokens;
     istringstream iss(comandoCompleto);
     string token;
-    
     while (iss >> token) {
         tokens.push_back(token);
     }
@@ -46,7 +50,7 @@ bool CommandParser::gestisciComandoSet(const vector<string>& tokens) {
                 serra.setOrario(nuovoOrario);
                 return true;
             } catch (const exception& e) {
-                cout << "Formato orario non valido. Usa HH:MM" << endl;
+                cerr << "Formato orario non valido. Usa HH:MM" << endl;
                 return false;
             }
         } else if (tokens.size() == 3) {
@@ -66,7 +70,7 @@ bool CommandParser::gestisciComandoSet(const vector<string>& tokens) {
                     Orario inizio(tokens[2]);
                     return serra.impostaTimer2(nomeImpianto, inizio);
                 } catch (const exception& e) {
-                    cout << "Formato non valido. Usa 'on', 'off' o un orario in formato HH:MM" << endl;
+                    cerr << "Formato non valido. Usa 'on', 'off' o un orario in formato HH:MM" << endl;
                     return false;
                 }
             }
@@ -79,12 +83,12 @@ bool CommandParser::gestisciComandoSet(const vector<string>& tokens) {
                 
                 return serra.impostaTimer(nomeImpianto, orarioInizio, orarioFine);
             } catch (const exception& e) {
-                cout << "Formato orario non valido. Usa HH:MM" << endl;
+                cerr << "Formato orario non valido. Usa HH:MM" << endl;
                 return false;
             }
         }
     }
-    cout << "Formato comando 'set' non valido" << endl;
+    cerr << "Formato comando 'set' non valido" << endl;
     return false;
 }
 
@@ -94,8 +98,7 @@ bool CommandParser::gestisciComandoRm(const vector<string>& tokens) {
         string nomeImpianto = tokens[1];
         return serra.rimuoviTimer(nomeImpianto);
     }
-    
-    cout << "Formato comando 'rm' non valido" << endl;
+    cerr << "Formato comando 'rm' non valido" << endl;
     return false;
 }
 
@@ -110,7 +113,7 @@ bool CommandParser::gestisciComandoShow(const vector<string>& tokens) {
         serra.mostraImpianto(nomeImpianto);
         return true;
     }
-    cout << "Formato comando 'show' non valido" << endl;
+    cerr << "Formato comando 'show' non valido" << endl;
     return false;
 }
 
@@ -130,7 +133,6 @@ bool CommandParser::gestisciComandoReset(const vector<string>& tokens) {
             return true;
         }
     }
-    
-    cout << "Formato comando 'reset' non valido" << endl;
+    cerr << "Formato comando 'reset' non valido" << endl;
     return false;
 }

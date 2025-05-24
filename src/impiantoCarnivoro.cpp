@@ -1,6 +1,7 @@
-#include "ImpiantoCarnivoro.h"
 #include <sstream>
 #include <iomanip>
+#include "CommandParser.h"
+#include "ImpiantoCarnivoro.h"
 
 ImpiantoCarnivoro::ImpiantoCarnivoro(int id, const string& nome)
     : Impianto(id, nome, 0.5f) { // Consumo di 0.5 litri al minuto
@@ -14,7 +15,7 @@ bool ImpiantoCarnivoro::impostaTimer(const Orario& inizio, const Orario& fine) {
 
 bool ImpiantoCarnivoro::impostaTimer2(const Orario& inizio) {
     orarioTimer = inizio;
-    cout << inizio.format() << " Timer impostato per \"" << nome << "\"" << endl;
+    logMessage(inizio, " Timer impostato per \"" + nome + "\"", 0);
     return true;
 }
 
@@ -30,7 +31,6 @@ void ImpiantoCarnivoro::aggiornaStato(const Orario& orarioPrecedente, const Orar
     if (!orarioTimer.has_value()) {
         return; // Nessun timer impostato
     }
-
     // Verifica se l'impianto dovrebbe essere acceso all'orario corrente
     bool dovrebbeEssereAttivoOra = dovrebbeEssereAttivo(orarioCorrente);
 
@@ -72,7 +72,6 @@ bool ImpiantoCarnivoro::dovrebbeEssereAttivo(const Orario& orario) const {
     if (!orarioTimer.has_value()) {
         return false;
     }
-
     // Calcola l'orario di spegnimento
     Orario orarioSpegnimento = calcolaOrarioSpegnimento();
 
@@ -89,7 +88,6 @@ Orario ImpiantoCarnivoro::calcolaOrarioSpegnimento() const {
     int durataIrrigazione = 150; // 2 ore e 30 minuti = 150 minuti
     int oreAggiuntive = durataIrrigazione / 60;
     int minutiAggiuntivi = durataIrrigazione % 60;
-
     int nuoveOre = (orarioTimer.value().getOre() + oreAggiuntive) % 24;
     int nuoviMinuti = (orarioTimer.value().getMinuti() + minutiAggiuntivi) % 60;
 
@@ -97,6 +95,5 @@ Orario ImpiantoCarnivoro::calcolaOrarioSpegnimento() const {
     if (orarioTimer.value().getMinuti() + minutiAggiuntivi >= 60) {
         nuoveOre = (nuoveOre + 1) % 24;
     }
-
     return Orario(nuoveOre, nuoviMinuti);
 }
