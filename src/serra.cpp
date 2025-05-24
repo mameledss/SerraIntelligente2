@@ -1,158 +1,205 @@
-#include "../include/Serra.h"
+#include "Serra.h"
+#include "CommandParser.h"
 #include <iostream>
 #include <algorithm>
 #include <iomanip>
+using namespace std;
 
 Serra::Serra() : orarioCorrente(0, 0), prossimoIdImpianto(1) {}
 
 Serra::~Serra() {
-    // Elimina tutti gli impianti
     for (auto impianto : impianti) {
         delete impianto;
     }
     impianti.clear();
 }
 
-bool Serra::aggiungiImpianto(const std::string& tipo, const std::string& nome) {
-    // Verifica se esiste già un impianto con lo stesso nome
+bool Serra::aggiungiImpianto(const string& tipo, const string& nome) {
     if (trovaImpianto(nome) != nullptr) {
-        std::cout << "Errore: Esiste già un impianto con il nome \"" << nome << "\"" << std::endl;
+        cout << "Errore: Esiste già un impianto con il nome \"" << nome << "\"" << endl;
         return false;
     }
 
-    // Crea un nuovo impianto
     Impianto* nuovoImpianto = Impianto::creaImpianto(prossimoIdImpianto, tipo, nome);
     if (!nuovoImpianto) {
-        std::cout << "Errore: Tipo di impianto \"" << tipo << "\" non riconosciuto" << std::endl;
+        cout << "Errore: Tipo di impianto \"" << tipo << "\" non riconosciuto" << endl;
         return false;
     }
 
-    // Aggiungi l'impianto alla collezione e incrementa l'ID
     impianti.push_back(nuovoImpianto);
     prossimoIdImpianto++;
 
-    std::cout << "Impianto \"" << nome << "\" aggiunto con successo" << std::endl;
+    cout << "Impianto \"" << nome << "\" aggiunto con successo" << endl;
     return true;
 }
 
-bool Serra::rimuoviImpianto(const std::string& nome) {
-    auto it = std::find_if(impianti.begin(), impianti.end(),
-                          [&nome](const Impianto* imp) {
-                              return imp->getNome() == nome;
-                          });
+bool Serra::rimuoviImpianto(const string& nome) {
+    auto it = find_if(impianti.begin(), impianti.end(),
+                      [&nome](const Impianto* imp) {
+                          return imp->getNome() == nome;
+                      });
 
     if (it != impianti.end()) {
         Impianto* impiantoDaRimuovere = *it;
         impianti.erase(it);
-        delete impiantoDaRimuovere;  // Libera la memoria
-        std::cout << "Impianto \"" << nome << "\" rimosso con successo" << std::endl;
+        delete impiantoDaRimuovere;
+        cout << "Impianto \"" << nome << "\" rimosso con successo" << endl;
         return true;
     }
 
-    std::cout << "Errore: Impianto \"" << nome << "\" non trovato" << std::endl;
+    cout << "Errore: Impianto \"" << nome << "\" non trovato" << endl;
     return false;
 }
 
 bool Serra::rimuoviImpianto(int id) {
-    auto it = std::find_if(impianti.begin(), impianti.end(),
-                          [id](const Impianto* imp) {
-                              return imp->getId() == id;
-                          });
+    auto it = find_if(impianti.begin(), impianti.end(),
+                      [id](const Impianto* imp) {
+                          return imp->getId() == id;
+                      });
 
     if (it != impianti.end()) {
-        std::string nome = (*it)->getNome();
+        string nome = (*it)->getNome();
         Impianto* impiantoDaRimuovere = *it;
         impianti.erase(it);
-        delete impiantoDaRimuovere;  // Libera la memoria
-        std::cout << "Impianto \"" << nome << "\" rimosso con successo" << std::endl;
+        delete impiantoDaRimuovere;
+        cout << "Impianto \"" << nome << "\" rimosso con successo" << endl;
         return true;
     }
 
-    std::cout << "Errore: Impianto con ID " << id << " non trovato" << std::endl;
+    cout << "Errore: Impianto con ID " << id << " non trovato" << endl;
     return false;
 }
 
-bool Serra::accendiImpianto(const std::string& nome) {
+bool Serra::accendiImpianto(const string& nome) {
     Impianto* impianto = trovaImpianto(nome);
     if (!impianto) {
-        std::cout << "Errore: Impianto \"" << nome << "\" non trovato" << std::endl;
+        cout << "Errore: Impianto \"" << nome << "\" non trovato" << endl;
         return false;
     }
 
     if (impianto->isAttivo()) {
-        std::cout << "Impianto \"" << nome << "\" è già acceso" << std::endl;
+        cout << "Impianto \"" << nome << "\" è già acceso" << endl;
         return true;
     }
 
-    if (impianto->accendi(orarioCorrente)) {
-        return true;
+    return impianto->accendi(orarioCorrente);
+}
+
+bool Serra::accendiImpiantoOn(const string& nome) {
+    Impianto* impianto = trovaImpianto(nome);
+    if (!impianto) {
+        cout << "Errore: Impianto \"" << nome << "\" non trovato" << endl;
+        return false;
     }
 
+    string info = impianto->getInfo();
+    bool isTropicale = info.find("Tropicale") != string::npos;
+    bool isAlpino = info.find("Alpino") != string::npos;
+    bool isCarnivoro = info.find("Carnivoro") != string::npos;
+
+    if (isTropicale || isAlpino || isCarnivoro) {
+        if (impianto->impostaTimer2(orarioCorrente)) {
+            if (!impianto->isAttivo()) {
+                impianto->accendi(orarioCorrente);
+            }
+            return true;
+        }
+    } else {
+        if (impianto->impostaTimer2(orarioCorrente)) {
+            if (!impianto->isAttivo()) {
+                impianto->accendi(orarioCorrente);
+            }
+            return true;
+        }
+    }
     return false;
 }
 
-bool Serra::spegniImpianto(const std::string& nome) {
+bool Serra::spegniImpianto(const string& nome) {
     Impianto* impianto = trovaImpianto(nome);
     if (!impianto) {
-        std::cout << "Errore: Impianto \"" << nome << "\" non trovato" << std::endl;
+        cout << "Errore: Impianto \"" << nome << "\" non trovato" << endl;
         return false;
     }
 
     if (!impianto->isAttivo()) {
-        std::cout << "Impianto \"" << nome << "\" è già spento" << std::endl;
+        cout << "Impianto \"" << nome << "\" è già spento" << endl;
         return true;
     }
 
     if (impianto->spegni(orarioCorrente)) {
+        impianto->rimuoviTimer();
         return true;
     }
 
     return false;
 }
 
-bool Serra::impostaTimer(const std::string& nome, const Orario& inizio, const Orario& fine) {
+bool Serra::impostaTimer(const string& nome, const Orario& inizio, const Orario& fine) {
     Impianto* impianto = trovaImpianto(nome);
     if (!impianto) {
-        std::cout << "Errore: Impianto \"" << nome << "\" non trovato" << std::endl;
+        cout << "Errore: Impianto \"" << nome << "\" non trovato" << endl;
+        return false;
+    }
+
+    string info = impianto->getInfo();
+    bool isTropicale = info.find("Tropicale") != string::npos;
+    bool isAlpino = info.find("Alpino") != string::npos;
+    bool isCarnivoro = info.find("Carnivoro") != string::npos;
+
+    if (isTropicale || isCarnivoro || isAlpino) {
+        cout << "Errore: Gli impianti automatici non supportano timer con intervallo specifico" << endl;
         return false;
     }
 
     if (impianto->impostaTimer(inizio, fine)) {
         return true;
     } else {
-        std::cout << "Errore: Impossibile impostare il timer per l'impianto \"" << nome << "\"" << std::endl;
+        cout << "Errore: Impossibile impostare il timer per l'impianto \"" << nome << "\"" << endl;
         return false;
     }
 }
 
-bool Serra::rimuoviTimer(const std::string& nome) {
+bool Serra::impostaTimer2(const string& nome, const Orario& inizio) {
     Impianto* impianto = trovaImpianto(nome);
     if (!impianto) {
-        std::cout << "Errore: Impianto \"" << nome << "\" non trovato" << std::endl;
+        cout << "Errore: Impianto \"" << nome << "\" non trovato" << endl;
+        return false;
+    }
+
+    if (impianto->impostaTimer2(inizio)) {
+        return true;
+    } else {
+        cout << "Errore: Impossibile impostare il timer per l'impianto \"" << nome << "\"" << endl;
+        return false;
+    }
+}
+
+bool Serra::rimuoviTimer(const string& nome) {
+    Impianto* impianto = trovaImpianto(nome);
+    if (!impianto) {
+        cout << "Errore: Impianto \"" << nome << "\" non trovato" << endl;
         return false;
     }
 
     if (impianto->rimuoviTimer()) {
-        std::cout << "[" << orarioCorrente.format() << "] Timer rimosso per \"" << nome << "\"" << std::endl;
+        cout << "[" << orarioCorrente.format() << "] Timer rimosso per \"" << nome << "\"" << endl;
         return true;
     } else {
-        std::cout << "Errore: Nessun timer impostato per l'impianto \"" << nome << "\"" << std::endl;
+        cout << "Errore: Nessun timer impostato per l'impianto \"" << nome << "\"" << endl;
         return false;
     }
 }
 
 void Serra::setOrario(const Orario& nuovoOrario) {
     if (nuovoOrario < orarioCorrente) {
-        std::cout << "Errore: Non è possibile impostare un orario precedente a quello attuale" << std::endl;
+        cout << "Errore: Non è possibile impostare un orario precedente a quello attuale" << endl;
         return;
     }
 
-    // Aggiorna lo stato degli impianti in base al nuovo orario
     aggiornaStatiImpianti(nuovoOrario);
-
-    // Aggiorna l'orario corrente
     orarioCorrente = nuovoOrario;
-    std::cout << orarioCorrente.format() << " L'orario attuale è " << orarioCorrente.format() << std::endl;
+    cout << orarioCorrente.format() << " L'orario attuale è " << orarioCorrente.format() << endl;
 }
 
 Orario Serra::getOrarioCorrente() const {
@@ -160,7 +207,6 @@ Orario Serra::getOrarioCorrente() const {
 }
 
 void Serra::resetOrario() {
-    // Spegni tutti gli impianti
     for (auto impianto : impianti) {
         if (impianto->isAttivo()) {
             impianto->spegni(orarioCorrente);
@@ -168,22 +214,19 @@ void Serra::resetOrario() {
         impianto->rimuoviTimer();
     }
 
-    // Reimposta l'orario a 00:00
     orarioCorrente = Orario(0, 0);
-    std::cout << orarioCorrente.format() << " Orario reimpostato a " << orarioCorrente.format() << std::endl;
+    cout << orarioCorrente.format() << " Orario reimpostato a " << orarioCorrente.format() << endl;
 }
 
 void Serra::resetTimers() {
-    // Rimuovi tutti i timer ma mantieni lo stato degli impianti
     for (auto impianto : impianti) {
         impianto->rimuoviTimer();
     }
 
-    std::cout << orarioCorrente.format() << " Tutti i timer sono stati rimossi" << std::endl;
+    cout << orarioCorrente.format() << " Tutti i timer sono stati rimossi" << endl;
 }
 
 void Serra::resetAll() {
-    // Spegni tutti gli impianti, rimuovi tutti i timer e reimposta l'orario
     for (auto impianto : impianti) {
         if (impianto->isAttivo()) {
             impianto->spegni(orarioCorrente);
@@ -192,97 +235,93 @@ void Serra::resetAll() {
     }
 
     orarioCorrente = Orario(0, 0);
-    std::cout << orarioCorrente.format() << " Sistema reimpostato completamente" << std::endl;
+    cout << orarioCorrente.format() << " Sistema reimpostato completamente" << endl;
 }
 
 void Serra::mostraStato() const {
     if (impianti.empty()) {
-        std::cout << "Nessun impianto presente nella serra" << std::endl;
+        cout << "Nessun impianto presente nella serra" << endl;
         return;
     }
 
-    std::cout << "Stato attuale degli impianti (orario: " << orarioCorrente.format() << "):" << std::endl;
-    std::cout << "--------------------------------------------------------" << std::endl;
-    std::cout << std::left << std::setw(5) << "ID"
-              << std::setw(15) << "Nome"
-              << std::setw(15) << "Tipo"
-              << std::setw(10) << "Stato"
-              << std::setw(20) << "Consumo (litri)" << std::endl;
-    std::cout << "--------------------------------------------------------" << std::endl;
+    cout << "Stato attuale degli impianti (orario: " << orarioCorrente.format() << "):" << endl;
+    cout << "--------------------------------------------------------" << endl;
+    cout << left << setw(5) << "ID"
+         << setw(15) << "Nome"
+         << setw(15) << "Tipo"
+         << setw(10) << "Stato"
+         << setw(20) << "Consumo (litri)" << endl;
+    cout << "--------------------------------------------------------" << endl;
 
     for (const auto impianto : impianti) {
-        std::string tipo = impianto->getInfo();
-        // Estrai solo il tipo dall'informazione completa
+        string tipo = impianto->getInfo();
         size_t posTipo = tipo.find(": ");
-        if (posTipo != std::string::npos) {
+        if (posTipo != string::npos) {
             tipo = tipo.substr(posTipo + 2);
         }
 
-        std::cout << std::left << std::setw(5) << impianto->getId()
-                  << std::setw(15) << impianto->getNome()
-                  << std::setw(15) << tipo
-                  << std::setw(10) << (impianto->isAttivo() ? "Acceso" : "Spento")
-                  << std::setw(20) << std::fixed << std::setprecision(2) << impianto->getConsumoTotale() << std::endl;
+        cout << left << setw(5) << impianto->getId()
+             << setw(15) << impianto->getNome()
+             << setw(15) << tipo
+             << setw(10) << (impianto->isAttivo() ? "Acceso" : "Spento")
+             << setw(20) << fixed << setprecision(2) << impianto->getConsumoTotale() << endl;
     }
-    std::cout << "--------------------------------------------------------" << std::endl;
+
+    cout << "--------------------------------------------------------" << endl;
 }
 
-void Serra::mostraImpianto(const std::string& nome) const {
-    auto it = std::find_if(impianti.begin(), impianti.end(),
-                          [&nome](const Impianto* imp) {
-                              return imp->getNome() == nome;
-                          });
+void Serra::mostraImpianto(const string& nome) const {
+    auto it = find_if(impianti.begin(), impianti.end(),
+                      [&nome](const Impianto* imp) {
+                          return imp->getNome() == nome;
+                      });
 
     if (it == impianti.end()) {
-        std::cout << "Errore: Impianto \"" << nome << "\" non trovato" << std::endl;
+        cout << "Errore: Impianto \"" << nome << "\" non trovato" << endl;
         return;
     }
 
     const auto impianto = *it;
-    std::cout << "Dettagli impianto:" << std::endl;
-    std::cout << "ID: " << impianto->getId() << std::endl;
-    std::cout << "Nome: " << impianto->getNome() << std::endl;
-    std::cout << "Stato: " << (impianto->isAttivo() ? "Acceso" : "Spento") << std::endl;
+    cout << "Dettagli impianto:" << endl;
+    cout << "ID: " << impianto->getId() << endl;
+    cout << "Nome: " << impianto->getNome() << endl;
+    cout << "Stato: " << (impianto->isAttivo() ? "Acceso" : "Spento") << endl;
 
     Orario ultimaAttivazione = impianto->getUltimaAttivazione();
-    std::cout << "Ultima attivazione: ";
+    cout << "Ultima attivazione: ";
     if (ultimaAttivazione.getOre() != 0 || ultimaAttivazione.getMinuti() != 0) {
-        std::cout << ultimaAttivazione.format() << std::endl;
+        cout << ultimaAttivazione.format() << endl;
     } else {
-        std::cout << "Mai" << std::endl;
+        cout << "Mai" << endl;
     }
 
-    std::cout << "Consumo totale: " << std::fixed << std::setprecision(2) << impianto->getConsumoTotale() << " litri" << std::endl;
+    cout << "Consumo totale: " << fixed << setprecision(2) << impianto->getConsumoTotale() << " litri" << endl;
 }
 
-Impianto* Serra::trovaImpianto(const std::string& nome) {
-    auto it = std::find_if(impianti.begin(), impianti.end(),
-                          [&nome](const Impianto* imp) {
-                              return imp->getNome() == nome;
-                          });
+Impianto* Serra::trovaImpianto(const string& nome) {
+    auto it = find_if(impianti.begin(), impianti.end(),
+                      [&nome](const Impianto* imp) {
+                          return imp->getNome() == nome;
+                      });
 
     return (it != impianti.end()) ? *it : nullptr;
 }
 
 Impianto* Serra::trovaImpianto(int id) {
-    auto it = std::find_if(impianti.begin(), impianti.end(),
-                          [id](const Impianto* imp) {
-                              return imp->getId() == id;
-                          });
+    auto it = find_if(impianti.begin(), impianti.end(),
+                      [id](const Impianto* imp) {
+                          return imp->getId() == id;
+                      });
 
     return (it != impianti.end()) ? *it : nullptr;
 }
 
 void Serra::aggiornaStatiImpianti(const Orario& nuovoOrario) {
-    // Per simulare il passaggio di tempo minuto per minuto
     Orario orarioSimulato = orarioCorrente;
 
-    // Iteriamo per ogni minuto tra l'orario corrente e il nuovo orario
     while (orarioSimulato < nuovoOrario) {
-        // Salva l'orario precedente per passarlo ai metodi di aggiornamento
         Orario orarioPrecedente = orarioSimulato;
 
-        // Avanza di un minuto
         int nuoveOre = orarioSimulato.getOre();
         int nuoviMinuti = orarioSimulato.getMinuti() + 1;
 
@@ -293,13 +332,7 @@ void Serra::aggiornaStatiImpianti(const Orario& nuovoOrario) {
 
         orarioSimulato = Orario(nuoveOre, nuoviMinuti);
 
-        // Controlla ogni impianto
         for (auto impianto : impianti) {
-            // Memorizza lo stato precedente per rilevare cambiamenti
-            bool eraAttivo = impianto->isAttivo();
-            Orario vecchiaUltimaAttivazione = impianto->getUltimaAttivazione();
-
-            // Aggiorna lo stato dell'impianto
             impianto->aggiornaStato(orarioPrecedente, orarioSimulato);
         }
     }

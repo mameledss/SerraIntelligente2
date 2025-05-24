@@ -4,27 +4,21 @@
 #include <string>
 #include <vector>
 #include "Serra.h"
+using namespace std;
 
 class CommandParser {
 private:
     Serra& serra;
     
 public:
-    // Costruttore
     CommandParser(Serra& serra);
-    
-    // Metodo per elaborare un comando
-    bool elaboraComando(const std::string& comandoCompleto);
+    bool elaboraComando(const string& comandoCompleto);
     
 private:
-    // Metodi per gestire i diversi tipi di comandi
-    bool gestisciComandoSet(const std::vector<std::string>& tokens);
-    bool gestisciComandoRm(const std::vector<std::string>& tokens);
-    bool gestisciComandoShow(const std::vector<std::string>& tokens);
-    bool gestisciComandoReset(const std::vector<std::string>& tokens);
-    
-    // Metodi ausiliari
-    std::vector<std::string> tokenizzaComando(const std::string& comandoCompleto);
+    bool gestisciComandoSet(const vector<string>& tokens);
+    bool gestisciComandoRm(const vector<string>& tokens);
+    bool gestisciComandoShow(const vector<string>& tokens);
+    bool gestisciComandoReset(const vector<string>& tokens);
+    vector<string> tokenizzaComando(const string& comandoCompleto);
 };
-
 #endif // COMMAND_PARSER_H

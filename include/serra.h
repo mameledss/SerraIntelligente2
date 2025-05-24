@@ -1,16 +1,15 @@
 #ifndef SERRA_H
 #define SERRA_H
 
-#include <memory>
 #include <vector>
-#include <map>
 #include <string>
 #include "Impianto.h"
 #include "Orario.h"
+using namespace std;
 
 class Serra {
 private:
-    std::vector<Impianto*> impianti;
+    vector<Impianto*> impianti;
     Orario orarioCorrente;
     int prossimoIdImpianto;
     
@@ -20,15 +19,17 @@ public:
     ~Serra();
 
     // Metodi di gestione impianti
-    bool aggiungiImpianto(const std::string& tipo, const std::string& nome);
-    bool rimuoviImpianto(const std::string& nome);
+    bool aggiungiImpianto(const string& tipo, const string& nome);
+    bool rimuoviImpianto(const string& nome);
     bool rimuoviImpianto(int id);
     
     // Metodi di controllo impianti
-    bool accendiImpianto(const std::string& nome);
-    bool spegniImpianto(const std::string& nome);
-    bool impostaTimer(const std::string& nome, const Orario& inizio, const Orario& fine);
-    bool rimuoviTimer(const std::string& nome);
+    bool accendiImpianto(const string& nome);
+    bool accendiImpiantoOn(const string& nome);
+    bool spegniImpianto(const string& nome);
+    bool impostaTimer(const string& nome, const Orario& inizio, const Orario& fine);
+    bool impostaTimer2(const string& nome, const Orario& inizio);
+    bool rimuoviTimer(const string& nome);
     
     // Metodi di gestione del tempo
     void setOrario(const Orario& nuovoOrario);
@@ -41,11 +42,11 @@ public:
     
     // Metodi di visualizzazione
     void mostraStato() const;
-    void mostraImpianto(const std::string& nome) const;
+    void mostraImpianto(const string& nome) const;
     
 private:
     // Metodi ausiliari
-    Impianto* trovaImpianto(const std::string& nome);
+    Impianto* trovaImpianto(const string& nome);
     Impianto* trovaImpianto(int id);
     void aggiornaStatiImpianti(const Orario& nuovoOrario);
 };

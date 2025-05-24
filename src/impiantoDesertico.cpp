@@ -1,15 +1,23 @@
-#include "../include/ImpiantoDesertico.h"
+#include "ImpiantoDesertico.h"
 #include <sstream>
 #include <iomanip>
 #include <iostream>
 
-ImpiantoDesertico::ImpiantoDesertico(int id, const std::string& nome)
+ImpiantoDesertico::ImpiantoDesertico(int id, const string& nome)
     : Impianto(id, nome, 0.3f) { // Consumo di 0.3 litri al minuto
 }
 
 bool ImpiantoDesertico::impostaTimer(const Orario& inizio, const Orario& fine) {
     timerIntervallo = TimerIntervallo(inizio, fine);
-    std::cout << inizio.format() << " Timer impostato per \"" << nome << "\"" << std::endl;
+    cout << inizio.format() << " Timer impostato per \"" << nome << "\"" << endl;
+    return true;
+}
+
+bool ImpiantoDesertico::impostaTimer2(const Orario& inizio) {
+    // Per l'impianto desertico, timer semplice significa accensione all'infinito
+    // Impostiamo un orario di fine molto lontano (23:59) per simulare l'infinito
+    timerIntervallo = TimerIntervallo(inizio, Orario(23, 59));
+    cout << inizio.format() << " Timer impostato per \"" << nome << "\"" << endl;
     return true;
 }
 
@@ -39,9 +47,11 @@ void ImpiantoDesertico::aggiornaStato(const Orario& orarioPrecedente, const Orar
             accendi(timerIntervallo->inizio);
         }
 
-        // Se attraversiamo l'orario di fine
-        if (orarioPrecedente < timerIntervallo->fine && orarioCorrente >= timerIntervallo->fine) {
-            spegni(timerIntervallo->fine);
+        // Se attraversiamo l'orario di fine (solo se non è 23:59 che rappresenta infinito)
+        if (timerIntervallo->fine.getOre() != 23 || timerIntervallo->fine.getMinuti() != 59) {
+            if (orarioCorrente >= timerIntervallo->fine) {
+                spegni(timerIntervallo->fine);
+            }
         }
     }
     // Se l'impianto è attivo, aggiorna il consumo
@@ -51,15 +61,24 @@ void ImpiantoDesertico::aggiornaStato(const Orario& orarioPrecedente, const Orar
     }
 }
 
-std::string ImpiantoDesertico::getInfo() const {
-    std::ostringstream oss;
-    oss << "Tipo: Desertico" << std::endl;
+string ImpiantoDesertico::getInfo() const {
+    ostringstream oss;
+    oss << "Impianto Desertico \"" << nome << "\" (ID: " << id << ")" << endl;
+    oss << "  Stato: " << (attivo ? "Attivo" : "Disattivo") << endl;
+    oss << "  Ultima attivazione: " << (attivo ? ultimaAttivazione.toString() : "Mai") << endl;
+    oss << "  Consumo totale: " << fixed << setprecision(2) << consumoTotale << " litri" << endl;
+    oss << "  Timer: " << (timerIntervallo.has_value() ? timerIntervallo.value() : "Non impostato") << endl;
     return oss.str();
 }
 
 bool ImpiantoDesertico::dovrebbeEssereAttivo(const Orario& orario) const {
     if (!timerIntervallo.has_value()) {
         return false;
+    }
+
+    // Se l'orario di fine è 23:59, consideriamo che l'impianto rimane acceso fino alla fine del giorno
+    if (timerIntervallo->fine.getOre() == 23 && timerIntervallo->fine.getMinuti() == 59) {
+        return orario >= timerIntervallo->inizio;
     }
     
     return orario.isDentroIntervallo(timerIntervallo->inizio, timerIntervallo->fine);

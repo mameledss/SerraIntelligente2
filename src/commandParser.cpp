@@ -1,22 +1,16 @@
-#include "../include/CommandParser.h"
-#include "../include/Orario.h"
 #include <iostream>
 #include <sstream>
-#include <algorithm>
+#include "CommandParser.h"
+#include "Orario.h"
 
-using namespace std;
 CommandParser::CommandParser(Serra& serra) : serra(serra) {}
 
-bool CommandParser::elaboraComando(const std::string& comandoCompleto) {
-    // Tokenizza il comando
-    std::vector<std::string> tokens = tokenizzaComando(comandoCompleto);
-    
+bool CommandParser::elaboraComando(const string& comandoCompleto) {
+    vector<string> tokens = tokenizzaComando(comandoCompleto); //suddivide comando in token
     if (tokens.empty()) {
         return false;
     }
-    
-    // Identifica il tipo di comando
-    std::string tipoComando = tokens[0];
+    string tipoComando = tokens[0]; // Identifica il tipo di comando
     
     if (tipoComando == "set") {
         return gestisciComandoSet(tokens);
@@ -27,24 +21,23 @@ bool CommandParser::elaboraComando(const std::string& comandoCompleto) {
     } else if (tipoComando == "reset") {
         return gestisciComandoReset(tokens);
     } else {
-        std::cout << "Comando non riconosciuto" << std::endl;
+        cout << "Comando non riconosciuto" << endl;
         return false;
     }
 }
 
-std::vector<std::string> CommandParser::tokenizzaComando(const std::string& comandoCompleto) {
-    std::vector<std::string> tokens;
-    std::istringstream iss(comandoCompleto);
-    std::string token;
+vector<string> CommandParser::tokenizzaComando(const string& comandoCompleto) {
+    vector<string> tokens;
+    istringstream iss(comandoCompleto);
+    string token;
     
     while (iss >> token) {
         tokens.push_back(token);
     }
-    
     return tokens;
 }
 
-bool CommandParser::gestisciComandoSet(const std::vector<std::string>& tokens) {
+bool CommandParser::gestisciComandoSet(const vector<string>& tokens) {
     if (tokens.size() >= 3) {
         if (tokens[1] == "time" && tokens.size() == 3) {
             // Gestisci comando "set time HH:MM"
@@ -52,73 +45,79 @@ bool CommandParser::gestisciComandoSet(const std::vector<std::string>& tokens) {
                 Orario nuovoOrario(tokens[2]);
                 serra.setOrario(nuovoOrario);
                 return true;
-            } catch (const std::exception& e) {
-                std::cout << "Formato orario non valido. Usa HH:MM" << std::endl;
+            } catch (const exception& e) {
+                cout << "Formato orario non valido. Usa HH:MM" << endl;
                 return false;
             }
         } else if (tokens.size() == 3) {
-            // Gestisci comando "set PLANTNAME on/off"
-            std::string nomeImpianto = tokens[1];
-            std::string azione = tokens[2];
-            
+            // Gestisci comando "set PLANTNAME on/off" o "set PLANTNAME HH:MM"
+            string nomeImpianto = tokens[1];
+            string azione = tokens[2];
+
             if (azione == "on") {
-                return serra.accendiImpianto(nomeImpianto);
+                // Gestisci comando "set PLANTNAME on"
+                return serra.accendiImpiantoOn(nomeImpianto);
             } else if (azione == "off") {
+                // Gestisci comando "set PLANTNAME off"
                 return serra.spegniImpianto(nomeImpianto);
             } else {
-                std::cout << "Azione non riconosciuta. Usa 'on' o 'off'" << std::endl;
-                return false;
+                try {
+                    // Gestisci comando "set PLANTNAME HH:MM"
+                    Orario inizio(tokens[2]);
+                    return serra.impostaTimer2(nomeImpianto, inizio);
+                } catch (const exception& e) {
+                    cout << "Formato non valido. Usa 'on', 'off' o un orario in formato HH:MM" << endl;
+                    return false;
+                }
             }
         } else if (tokens.size() == 4) {
-            // Gestisci comando "set PLANTNAME START STOP"
-            std::string nomeImpianto = tokens[1];
+            // Gestisci comando "set PLANTNAME START STOP" (solo per desertico)
+            string nomeImpianto = tokens[1];
             try {
                 Orario orarioInizio(tokens[2]);
                 Orario orarioFine(tokens[3]);
                 
                 return serra.impostaTimer(nomeImpianto, orarioInizio, orarioFine);
-            } catch (const std::exception& e) {
-                std::cout << "Formato orario non valido. Usa HH:MM" << std::endl;
+            } catch (const exception& e) {
+                cout << "Formato orario non valido. Usa HH:MM" << endl;
                 return false;
             }
         }
     }
-    
-    std::cout << "Formato comando 'set' non valido" << std::endl;
+    cout << "Formato comando 'set' non valido" << endl;
     return false;
 }
 
-bool CommandParser::gestisciComandoRm(const std::vector<std::string>& tokens) {
+bool CommandParser::gestisciComandoRm(const vector<string>& tokens) {
     if (tokens.size() == 2) {
         // Gestisci comando "rm PLANTNAME"
-        std::string nomeImpianto = tokens[1];
+        string nomeImpianto = tokens[1];
         return serra.rimuoviTimer(nomeImpianto);
     }
     
-    std::cout << "Formato comando 'rm' non valido" << std::endl;
+    cout << "Formato comando 'rm' non valido" << endl;
     return false;
 }
 
-bool CommandParser::gestisciComandoShow(const std::vector<std::string>& tokens) {
+bool CommandParser::gestisciComandoShow(const vector<string>& tokens) {
     if (tokens.size() == 1) {
         // Gestisci comando "show"
         serra.mostraStato();
         return true;
     } else if (tokens.size() == 2) {
         // Gestisci comando "show PLANTNAME"
-        std::string nomeImpianto = tokens[1];
+        string nomeImpianto = tokens[1];
         serra.mostraImpianto(nomeImpianto);
         return true;
     }
-    
-    std::cout << "Formato comando 'show' non valido" << std::endl;
+    cout << "Formato comando 'show' non valido" << endl;
     return false;
 }
 
-bool CommandParser::gestisciComandoReset(const std::vector<std::string>& tokens) {
+bool CommandParser::gestisciComandoReset(const vector<string>& tokens) {
     if (tokens.size() == 2) {
         // Gestisci comando "reset time/timers/all"
-        std::string tipoReset = tokens[1];
+        string tipoReset = tokens[1];
         
         if (tipoReset == "time") {
             serra.resetOrario();
@@ -132,6 +131,6 @@ bool CommandParser::gestisciComandoReset(const std::vector<std::string>& tokens)
         }
     }
     
-    std::cout << "Formato comando 'reset' non valido" << std::endl;
+    cout << "Formato comando 'reset' non valido" << endl;
     return false;
 }

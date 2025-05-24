@@ -3,6 +3,7 @@
 
 #include "Impianto.h"
 #include <optional>
+using namespace std;
 
 class ImpiantoTropicale : public Impianto {
 private:
@@ -11,13 +12,16 @@ private:
     
 public:
     // Costruttore
-    ImpiantoTropicale(int id, const std::string& nome);
+    ImpiantoTropicale(int id, const string& nome);
     
     // Implementazione dei metodi virtuali
     bool impostaTimer(const Orario& inizio, const Orario& fine) override;
+
+    bool impostaTimer2(const Orario& inizio) override;
+
     bool rimuoviTimer() override;
     void aggiornaStato(const Orario& orarioPrecedente, const Orario& orarioCorrente) override;
-    std::string getInfo() const override;
+    string getInfo() const override;
     
 private:
     // Metodo per verificare se l'impianto dovrebbe essere attivo a un determinato orario

@@ -1,9 +1,10 @@
-#include "../include/Impianto.h"
-#include "../include/ImpiantoTropicale.h"
-#include "../include/ImpiantoDesertico.h"
+#include "Impianto.h"
+#include "ImpiantoTropicale.h"
+#include "ImpiantoDesertico.h"
+#include "ImpiantoAlpino.h"
+#include "ImpiantoCarnivoro.h"
+#include "ImpiantoMediterraneo.h"
 #include <iostream>
-
-using namespace std;
 
 Impianto::Impianto(int id, const string& nome, float consumoPerMinuto)
     : id(id), nome(nome), attivo(false), ultimaAttivazione(), consumoPerMinuto(consumoPerMinuto), consumoTotale(0.0f) {}
@@ -44,7 +45,7 @@ bool Impianto::spegni(const Orario& orarioCorrente) {
         // Aggiorna il consumo totale
         int minutiAttivi = orarioCorrente.diffInMinuti(ultimaAttivazione);
         aggiornaConsumo(minutiAttivi);
-        std::cout << orarioCorrente.format() << " L'impianto \"" << nome << "\" si è spento" << std::endl;
+        cout << orarioCorrente.format() << " L'impianto \"" << nome << "\" si è spento" << endl;
         return true;
     }
     return false;
@@ -56,13 +57,18 @@ void Impianto::aggiornaConsumo(int minutiAttivi) {
     }
 }
 
-Impianto* Impianto::creaImpianto(int id, const std::string& tipo, const std::string& nome) {
+Impianto* Impianto::creaImpianto(int id, const string& tipo, const string& nome) {
     if (tipo == "Tropicale") {
         return new ImpiantoTropicale(id, nome);
     } else if (tipo == "Desertico") {
         return new ImpiantoDesertico(id, nome);
+    } else if (tipo == "Alpino") {
+        return new ImpiantoAlpino(id, nome);
+    } else if (tipo == "Carnivoro") {
+        return new ImpiantoCarnivoro(id, nome);
+    } else if (tipo == "Mediterraneo") {
+        return new ImpiantoMediterraneo(id, nome);
+    } else {
+        return nullptr;
     }
-
-    // Tipo non riconosciuto
-    return nullptr;
 }
