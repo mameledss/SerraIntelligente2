@@ -20,7 +20,9 @@ public:
     // Metodi per ottenere ore e minuti
     int getOre() const;
     int getMinuti() const;
-    
+
+    static Orario Now();
+    string  displayTime() const;
     // Metodi per impostare ore e minuti
     void setOre(int ore);
     void setMinuti(int minuti);

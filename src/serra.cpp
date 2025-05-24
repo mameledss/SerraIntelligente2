@@ -1,3 +1,4 @@
+
 #include "../include/Serra.h"
 #include <iostream>
 #include <algorithm>
@@ -152,7 +153,8 @@ void Serra::setOrario(const Orario& nuovoOrario) {
 
     // Aggiorna l'orario corrente
     orarioCorrente = nuovoOrario;
-    std::cout << orarioCorrente.format() << " L'orario attuale è " << orarioCorrente.format() << std::endl;
+   // std::cout << orarioCorrente.format() << " L'orario attuale :" << orarioCorrente.format() << std::endl;
+   // cerr<< " L'orario attuale :" << orarioCorrente.format() << std::endl;
 }
 
 Orario Serra::getOrarioCorrente() const {

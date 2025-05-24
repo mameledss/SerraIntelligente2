@@ -1,6 +1,7 @@
 #include "../include/Orario.h"
 #include <iomanip>
 #include <sstream>
+#include <ctime>  // Aggiunto per la funzione time()
 
 using namespace std;
 
@@ -21,6 +22,17 @@ Orario::Orario(const string& orarioStr) {
         minuti = 0;
     }
 }
+
+string Orario::displayTime() const {
+    return toString();
+}
+
+Orario Orario::Now() {
+    const time_t now = time(nullptr);
+    tm* timeinfo = localtime(&now);
+    return {timeinfo->tm_hour, timeinfo->tm_min};
+}
+
 
 int Orario::getOre() const {
     return ore;

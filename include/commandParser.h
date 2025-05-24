@@ -8,23 +8,21 @@
 class CommandParser {
 private:
     Serra& serra;
-    
+
 public:
     // Costruttore
-    CommandParser(Serra& serra);
-    
+    explicit CommandParser(Serra& serra);
+
     // Metodo per elaborare un comando
-    bool elaboraComando(const std::string& comandoCompleto);
-    
+    bool commandParser(const std::string &comandoCompleto);
+
 private:
     // Metodi per gestire i diversi tipi di comandi
-    bool gestisciComandoSet(const std::vector<std::string>& tokens);
-    bool gestisciComandoRm(const std::vector<std::string>& tokens);
-    bool gestisciComandoShow(const std::vector<std::string>& tokens);
-    bool gestisciComandoReset(const std::vector<std::string>& tokens);
-    
-    // Metodi ausiliari
-    std::vector<std::string> tokenizzaComando(const std::string& comandoCompleto);
+    void logMessage(const Orario &time, const std::string &message, const int &errorLevel);
+    std::vector<std::string> parseCommand(const std::string &comandoCompleto);
+
+
+
 };
 
 #endif // COMMAND_PARSER_H
