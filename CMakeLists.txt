@@ -3,11 +3,8 @@ project(SerraIntelligente2)
 
 set(CMAKE_CXX_STANDARD 20)
 
-# Includi la directory degli header
-include_directories(include)
+include_directories(include) #include la directory degli header
 
-# Trova tutti i file sorgente nella directory src
-file(GLOB SOURCES "src/*.cpp")
+file(GLOB SOURCES "src/*.cpp") #trova tutti i file sorgente nella directory src
 
-# Crea l'eseguibile con tutti i file sorgente
-add_executable(SerraIntelligente2 ${SOURCES})
+add_executable(SerraIntelligente2 ${SOURCES}) #crea l'eseguibile con tutti i file sorgente
