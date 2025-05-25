@@ -6,13 +6,12 @@
 #include "../include/CommandParser.h"
 #include "../include/Serra.h"
 #include "../include/Orario.h"
-#include "../include/logger.h"  // Cambiato da "Logger.h" a "../include/Logger.h"
+#include "../include/logger.h"
 using namespace std;
 
 CommandParser::CommandParser(Serra& serra) : serra(serra) {}
 
-// RIMUOVI COMPLETAMENTE questo metodo dal .cpp
-// Il logging ora viene gestito dalla classe Logger statica
+
 
 std::vector<std::string> CommandParser::parseCommand(const std::string &command) {
     std::vector<std::string> tokens;
