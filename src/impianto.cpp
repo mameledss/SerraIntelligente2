@@ -62,6 +62,15 @@ Impianto* Impianto::creaImpianto(int id, const std::string& tipo, const std::str
     } else if (tipo == "Desertico") {
         return new ImpiantoDesertico(id, nome);
     }
+    else if (tipo == "Carnivoro") {
+        return new ImpiantoDesertico(id, nome);
+    }
+    else if (tipo == "Alpino") {
+        return new ImpiantoDesertico(id, nome);
+    }
+    else if (tipo == "Mediterraneo") {
+        return new ImpiantoDesertico(id, nome);
+    }
 
     // Tipo non riconosciuto
     return nullptr;

@@ -7,6 +7,8 @@
 #include "../include/Serra.h"
 #include "../include/Orario.h"
 
+using namespace std;
+
 CommandParser::CommandParser(Serra& serra) : serra(serra) {}
 
 void CommandParser::logMessage(const Orario &time, const std::string &message, const int &errorLevel) {
@@ -155,8 +157,22 @@ bool CommandParser::commandParser(const std::string &command) {
                 serra.mostraStato();
                 return true;
             } else if (tokens.size() == 2) {
-                serra.mostraImpianto(tokens[1]);
-                return true;
+                const std::string &showType = tokens[1];
+
+                if (showType == "tipi") {
+                    // Mostra tutti i tipi di impianti disponibili
+                    logMessage(time, "Tipi di impianti disponibili:", 0);
+                    cout << "  - Tropicale" << endl;
+                    cout << "  - Desertico" << endl;
+                    cout << "  - Carnivoro" << endl;
+                    cout << "  - Alpino" << endl;
+                    cout << "  - Mediterraneo" << endl;
+                    return true;
+                } else {
+
+                    serra.mostraImpianto(showType);
+                    return true;
+                }
             } else {
                 throw std::invalid_argument("Errore: comando 'show' non valido. Usa: show oppure show ${DEVICENAME}");
             }
@@ -189,7 +205,7 @@ bool CommandParser::commandParser(const std::string &command) {
             const std::string &tipo = tokens[1];
             const std::string &nomeImpianto = tokens[2];
 
-            // Validare i tipi supportati
+
             if (tipo != "Tropicale" && tipo != "Desertico" && tipo != "Carnivoro" &&
                 tipo != "Alpino" && tipo != "Mediterraneo") {
                 throw std::invalid_argument("Errore: tipo impianto non supportato. Tipi disponibili: Tropicale, Desertico, Carnivoro, Alpino, Mediterraneo");
