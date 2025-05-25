@@ -1,6 +1,8 @@
 #include "../include/ImpiantoTropicale.h"
 #include <sstream>
 #include <iomanip>
+#include "logger.h"
+
 
 using namespace std;
 

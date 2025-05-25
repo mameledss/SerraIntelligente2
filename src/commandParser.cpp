@@ -6,17 +6,13 @@
 #include "../include/CommandParser.h"
 #include "../include/Serra.h"
 #include "../include/Orario.h"
-
+#include "../include/logger.h"  // Cambiato da "Logger.h" a "../include/Logger.h"
 using namespace std;
 
 CommandParser::CommandParser(Serra& serra) : serra(serra) {}
 
-void CommandParser::logMessage(const Orario &time, const std::string &message, const int &errorLevel) {
-    if (errorLevel == 0)
-        std::cout << "[" << time.format() << "] " << message << std::endl;
-    else if (errorLevel == 1)
-        std::cerr << "[" << time.format() << "] " << message << std::endl;
-}
+// RIMUOVI COMPLETAMENTE questo metodo dal .cpp
+// Il logging ora viene gestito dalla classe Logger statica
 
 std::vector<std::string> CommandParser::parseCommand(const std::string &command) {
     std::vector<std::string> tokens;
@@ -62,7 +58,8 @@ std::vector<std::string> CommandParser::parseCommand(const std::string &command)
 
 bool CommandParser::commandParser(const std::string &command) {
     Orario time = serra.getOrarioCorrente();
-   //logMessage(time, "Comando ricevuto: " + command, 0);
+    // Usa il logger statico invece del metodo locale
+    Logger::logMessage(time, "Comando ricevuto: " + command, 0);
 
     try {
         std::vector<std::string> tokens = parseCommand(command);
@@ -74,80 +71,63 @@ bool CommandParser::commandParser(const std::string &command) {
         const std::string &action = tokens[0];
 
         if (action == "set") {
-    if (tokens.size() < 2) {
-        throw std::invalid_argument("Errore: comando 'set' incompleto.");
-    }
-
-    const std::string &deviceName = tokens[1];
-
-    if (deviceName == "time") {
-        if (tokens.size() != 3) {
-            throw std::invalid_argument("Errore: formato per 'set time' non valido. Usa: set time HH:MM");
-        }
-
-        try {
-            Orario nuovoOrario(tokens[2]);
-            serra.setOrario(nuovoOrario);
-            logMessage(nuovoOrario, "Orario impostato a: " + nuovoOrario.format(), 0);
-            return true;
-        }
-        catch (const std::exception& e) {
-            throw std::invalid_argument("Errore: formato orario non valido. Usa HH:MM");
-        }
-    } else {
-        // Gestione comandi per impianti
-        if (tokens.size() < 3) {
-            throw std::invalid_argument("Errore: comando 'set' incompleto per dispositivo.");
-        }
-
-        const std::string &operation = tokens[2];
-
-        if (operation == "on") {
-            return serra.accendiImpianto(deviceName);
-        } else if (operation == "off") {
-            return serra.spegniImpianto(deviceName);
-            // SOSTITUISCI QUESTA PARTE nel tuo codice originale:
-            // Dalla riga che inizia con "} else {" dopo il controllo "if (deviceName == "time")"
-            // Fino alla fine del blocco "if (action == "set")"
-
-        } else {
-            // Gestione comandi per impianti
-            if (tokens.size() < 3) {
-                throw std::invalid_argument("Errore: comando 'set' incompleto per dispositivo.");
+            if (tokens.size() < 2) {
+                throw std::invalid_argument("Errore: comando 'set' incompleto.");
             }
 
-            const std::string &operation = tokens[2];
+            const std::string &deviceName = tokens[1];
 
-            if (operation == "on") {
-                return serra.accendiImpianto(deviceName);
-            } else if (operation == "off") {
-                return serra.spegniImpianto(deviceName);
-            } else {
-                // Gestisci comando "set PLANTNAME HH:MM"
+            if (deviceName == "time") {
+                if (tokens.size() != 3) {
+                    throw std::invalid_argument("Errore: formato per 'set time' non valido. Usa: set time HH:MM");
+                }
+
                 try {
-                    Orario inizio(operation);
+                    Orario nuovoOrario(tokens[2]);
+                    serra.setOrario(nuovoOrario);
+                    Logger::logMessage(nuovoOrario, "Orario impostato a: " + nuovoOrario.format(), 0);
+                    return true;
+                }
+                catch (const std::exception& e) {
+                    throw std::invalid_argument("Errore: formato orario non valido. Usa HH:MM");
+                }
+            } else {
+                // Gestione comandi per impianti
+                if (tokens.size() < 3) {
+                    throw std::invalid_argument("Errore: comando 'set' incompleto per dispositivo.");
+                }
 
-                    if (tokens.size() == 3) {
-                        // Timer con durata predefinita di 1 ora
-                        int oreSpegnimento = (inizio.getOre() + 1) % 24;
-                        int minutiSpegnimento = inizio.getMinuti();
-                        Orario orarioSpegnimento(oreSpegnimento, minutiSpegnimento);
+                const std::string &operation = tokens[2];
 
-                        return serra.impostaTimer(deviceName, inizio, orarioSpegnimento);
-                    } else if (tokens.size() == 4) {
-                        // Timer con orario di fine specificato
-                        Orario orarioFine(tokens[3]);
-                        return serra.impostaTimer(deviceName, inizio, orarioFine);
-                    } else {
-                        throw std::invalid_argument("Errore: troppi parametri per il comando set.");
+                if (operation == "on") {
+                    return serra.accendiImpianto(deviceName);
+                } else if (operation == "off") {
+                    return serra.spegniImpianto(deviceName);
+                } else {
+                    // Gestisci comando "set PLANTNAME HH:MM"
+                    try {
+                        Orario inizio(operation);
+
+                        if (tokens.size() == 3) {
+                            // Timer con durata predefinita di 1 ora
+                            int oreSpegnimento = (inizio.getOre() + 1) % 24;
+                            int minutiSpegnimento = inizio.getMinuti();
+                            Orario orarioSpegnimento(oreSpegnimento, minutiSpegnimento);
+
+                            return serra.impostaTimer(deviceName, inizio, orarioSpegnimento);
+                        } else if (tokens.size() == 4) {
+                            // Timer con orario di fine specificato
+                            Orario orarioFine(tokens[3]);
+                            return serra.impostaTimer(deviceName, inizio, orarioFine);
+                        } else {
+                            throw std::invalid_argument("Errore: troppi parametri per il comando set.");
+                        }
+                    } catch (const std::exception& e) {
+                        throw std::invalid_argument("Errore: formato orario non valido per il timer. Usa HH:MM");
                     }
-                } catch (const std::exception& e) {
-                    throw std::invalid_argument("Errore: formato orario non valido per il timer. Usa HH:MM");
                 }
             }
-        }
-    }
-} else if (action == "rm") {
+        } else if (action == "rm") {
             if (tokens.size() != 2) {
                 throw std::invalid_argument("Errore: comando 'rm' non valido. Usa: rm " + tokens[1]);
             }
@@ -161,7 +141,7 @@ bool CommandParser::commandParser(const std::string &command) {
 
                 if (showType == "tipi") {
                     // Mostra tutti i tipi di impianti disponibili
-                    logMessage(time, "Tipi di impianti disponibili:", 0);
+                    Logger::logMessage(time, "Tipi di impianti disponibili:", 0);
                     cout << "  - Tropicale" << endl;
                     cout << "  - Desertico" << endl;
                     cout << "  - Carnivoro" << endl;
@@ -169,7 +149,6 @@ bool CommandParser::commandParser(const std::string &command) {
                     cout << "  - Mediterraneo" << endl;
                     return true;
                 } else {
-
                     serra.mostraImpianto(showType);
                     return true;
                 }
@@ -198,13 +177,11 @@ bool CommandParser::commandParser(const std::string &command) {
             }
         } else if (action == "add") {
             if (tokens.size() != 3) {
-
                 throw std::invalid_argument("Errore: comando 'add' non valido. Usa: add [tipo] [nome_impianto]");
             }
 
             const std::string &tipo = tokens[1];
             const std::string &nomeImpianto = tokens[2];
-
 
             if (tipo != "Tropicale" && tipo != "Desertico" && tipo != "Carnivoro" &&
                 tipo != "Alpino" && tipo != "Mediterraneo") {
@@ -213,7 +190,7 @@ bool CommandParser::commandParser(const std::string &command) {
 
             bool risultato = serra.aggiungiImpianto(tipo, nomeImpianto);
             if (risultato) {
-                logMessage(time, "Impianto '" + nomeImpianto + "' di tipo '" + tipo + "' aggiunto con successo", 0);
+                Logger::logMessage(time, "Impianto '" + nomeImpianto + "' di tipo '" + tipo + "' aggiunto con successo", 0);
             }
             return risultato;
 
@@ -225,15 +202,15 @@ bool CommandParser::commandParser(const std::string &command) {
             const std::string &nomeImpianto = tokens[1];
             bool risultato = serra.rimuoviImpianto(nomeImpianto);
             if (risultato) {
-                logMessage(time, "Impianto '" + nomeImpianto + "' rimosso con successo", 0);
+                Logger::logMessage(time, "Impianto '" + nomeImpianto + "' rimosso con successo", 0);
             }
             return risultato;
 
-        }else {
+        } else {
             throw std::invalid_argument("Errore: comando '" + action + "' non riconosciuto.");
         }
     } catch (const std::exception& e) {
-        logMessage(time, e.what(), 1);
+        Logger::logMessage(time, e.what(), 1);
         return false;
     }
 

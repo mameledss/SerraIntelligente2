@@ -2,7 +2,7 @@
 #include <iomanip>
 #include "CommandParser.h"
 #include "ImpiantoAlpino.h"
-
+#include "logger.h"
 
 using  namespace std;
 

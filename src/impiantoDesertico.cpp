@@ -2,7 +2,7 @@
 #include <sstream>
 #include <iomanip>
 #include <iostream>
-
+#include "logger.h"
 ImpiantoDesertico::ImpiantoDesertico(int id, const std::string& nome)
     : Impianto(id, nome, 0.3f) { // Consumo di 0.3 litri al minuto
 }

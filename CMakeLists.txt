@@ -12,4 +12,5 @@ file(GLOB SOURCES "src/*.cpp")
 # Crea l'eseguibile con tutti i file sorgente
 add_executable(SerraIntelligente2 ${SOURCES}
         src/impiantoMediterraneo.cpp
-        src/impiantoAlpino.cpp)
+        src/impiantoAlpino.cpp
+        src/logger.cpp)

@@ -2,7 +2,7 @@
 #include <iomanip>
 #include "CommandParser.h"
 #include "ImpiantoCarnivoro.h"
-
+#include "logger.h"
 ImpiantoCarnivoro::ImpiantoCarnivoro(int id, const string& nome)
     : Impianto(id, nome, 0.5f) { // Consumo di 0.5 litri al minuto
 }

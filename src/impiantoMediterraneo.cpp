@@ -3,6 +3,8 @@
 #include <cstdlib> // Per rand() e srand()
 #include <ctime>   // Per time()
 #include "ImpiantoMediterraneo.h"
+#include "logger.h"
+
 
 ImpiantoMediterraneo::ImpiantoMediterraneo(int id, const string& nome)
     : Impianto(id, nome, 0.4f), temperatura(28.0f) {
