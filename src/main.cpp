@@ -1,14 +1,15 @@
 #include <iostream>
-#include <string>
 #include "Serra.h"
 #include "CommandParser.h"
 using namespace std;
-
+//stampa il menu principale
 void stampaIntroduzione() {
     cout << "==================================================================" << endl;
     cout << "        SISTEMA DI GESTIONE SERRA INTELLIGENTE" << endl;
     cout << "==================================================================" << endl;
     cout << "Comandi disponibili:" << endl;
+    cout << "  - add [tipo_impianto] [nome]   : Aggiungi un nuovo impianto" << endl;
+    cout << "  - rm -i [nome_impianto]        : Rimuovi un impianto" << endl;
     cout << "  - set [nome_impianto] on       : Accendi manualmente un impianto" << endl;
     cout << "  - set [nome_impianto] off      : Spegni manualmente un impianto" << endl;
     cout << "  - set [nome_impianto] [HH:MM]  : Imposta timer di accensione/spegnimento" << endl;
@@ -22,30 +23,28 @@ void stampaIntroduzione() {
     cout << "  - reset all                    : Ripristina condizioni iniziali" << endl;
     cout << "  - exit                         : Esci dal programma" << endl;
     cout << "==================================================================" << endl;
+    cout << "Tipi di impianto supportati:" << endl;
+    cout << "  - Tropicale, Desertico, Carnivoro, Alpino, Mediterraneo" << endl;
+    cout << "==================================================================" << endl;
     cout << "Orario attuale: 00:00" << endl;
+    cout << "Nessun impianto presente. Usa 'add' per aggiungere impianti." << endl;
 }
 
 int main() {
-    Serra serra;
-    CommandParser parser(serra);
-    string comando;
+    Serra serra; //serra
+    CommandParser parser(serra); //commandparser a cui viene passata la serra come parametro
+    string comando; //string per contenere il comando inserito dall'utente
 
-    // Aggiungi alcuni impianti predefiniti
-    serra.aggiungiImpianto("Tropicale", "Tropicale");
-    serra.aggiungiImpianto("Desertico", "Desertico");
-    serra.aggiungiImpianto("Carnivoro", "Carnivoro");
-    serra.aggiungiImpianto("Alpino", "Alpino");
-    serra.aggiungiImpianto("Mediterraneo", "Mediterraneo");
     stampaIntroduzione();
 
-    while (true) {
-        cout << "\n> ";
-        getline(cin, comando);
+    while (true) { //per sempre
+        cout << "> "; //stampa il > per inicare la riga in cui inserire il comando
+        getline(cin, comando); //ottiene il comando inserito dall'utente
 
-        if (comando == "exit") {
-            break;
-        }
-        parser.elaboraComando(comando);
+        if (comando == "exit")  //se il comando è "exit"
+            break; //interrompe l'esecuzione
+
+        parser.elaboraComando(comando); //passa il comando al commandparser
     }
     cout << "Arrivederci!" << endl;
     return 0;

@@ -2,33 +2,21 @@
 #define IMPIANTO_TROPICALE_H
 
 #include "Impianto.h"
-#include <optional>
+#include <optional> //include optional (variabile che può essere nulla o contenere un valore)
 using namespace std;
 
-class ImpiantoTropicale : public Impianto {
+class ImpiantoTropicale : public Impianto { //classe che rappresenta l'impianto tropicale, derivato da Impianto
 private:
-    std::optional<Orario> orarioTimer;
-    const int durataIrrigazione = 150; // Durata in minuti (2.5 ore)
-    
-public:
-    // Costruttore
-    ImpiantoTropicale(int id, const string& nome);
-    
-    // Implementazione dei metodi virtuali
-    bool impostaTimer(const Orario& inizio, const Orario& fine) override;
-
-    bool impostaTimer2(const Orario& inizio) override;
-
-    bool rimuoviTimer() override;
-    void aggiornaStato(const Orario& orarioPrecedente, const Orario& orarioCorrente) override;
-    string getInfo() const override;
-    
-private:
-    // Metodo per verificare se l'impianto dovrebbe essere attivo a un determinato orario
+    optional<Orario> orarioTimer; //orario di inizio del timer, opzionale
+    const int durataIrrigazione = 150; //durata irrigazione fissa di 150 minuti (2 ore e mezza)
     bool dovrebbeEssereAttivo(const Orario& orario) const;
-    
-    // Metodo per calcolare l'orario di spegnimento
     Orario calcolaOrarioSpegnimento() const;
+public:
+    ImpiantoTropicale(int id, const string& nome); //costruttore con ID e nome
+    bool impostaTimer(const Orario& inizio, const Orario& fine) override; //override metodo per impostare un timer con inizio/fine
+    bool impostaTimer2(const Orario& inizio) override; //override metodo alternativo di timer (solo inizio)
+    bool rimuoviTimer() override; //override metodo alternativo di timer (solo inizio)
+    void aggiornaStato(const Orario& orarioPrecedente, const Orario& orarioCorrente) override; //override metodo per aggiornare stato impianto confrontando orari
+    string getTipo() const override; //override metodo per restituire informazioni sotto forma di stringa
 };
-
 #endif // IMPIANTO_TROPICALE_H

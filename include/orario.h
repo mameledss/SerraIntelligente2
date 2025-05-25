@@ -2,51 +2,30 @@
 #define ORARIO_H
 
 #include <string>
-#include <iostream>
 using namespace std;
 
-class Orario {
+class Orario { //classe Orario, per rappresentare un orario del giorno
 private:
-    int ore;
-    int minuti;
-    
+    int ore; //ore (0-23)
+    int minuti; //minuti (0-59)
 public:
-    // Costruttori
-    Orario();
-    Orario(int ore, int minuti);
-    Orario(const string& orarioStr);
-    
-    // Metodi per ottenere ore e minuti
-    int getOre() const;
-    int getMinuti() const;
-    
-    // Metodi per impostare ore e minuti
-    void setOre(int ore);
-    void setMinuti(int minuti);
-    
-    // Confronto tra orari
-    bool operator<(const Orario& altro) const;
-    bool operator<=(const Orario& altro) const;
-    bool operator>(const Orario& altro) const;
-    bool operator>=(const Orario& altro) const;
-    bool operator==(const Orario& altro) const;
-    bool operator!=(const Orario& altro) const;
-    
-    // Operazioni tra orari
-    Orario operator+(const Orario& altro) const;
-    Orario operator-(const Orario& altro) const;
-    
-    // Calcola la differenza in minuti tra due orari
-    int diffInMinuti(const Orario& altro) const;
-    
-    // Converti in stringa nel formato "HH:MM"
-    std::string toString() const;
-    
-    // Verifica se l'orario è compreso nell'intervallo [inizio, fine]
-    bool isDentroIntervallo(const Orario& inizio, const Orario& fine) const;
-    
-    // Formatta l'orario per output
-    string format() const;
+    Orario(); //costruttore di default: inizializza ore e minuti a 0
+    Orario(int ore, int minuti); //costruttore con ore e minuti come parametri
+    Orario(const string& orarioStr); //costruttore con stringa nel formato "HH:MM"
+    int getOre() const; //ritorna il valore delle ore
+    int getMinuti() const; //ritorna il valore dei minuti
+    void setOre(int ore); //imposta il valore delle ore
+    void setMinuti(int minuti); //e dei minuti
+    bool operator<(const Orario& altro) const; //operatore minore: verifica se l'orario corrente è antecedente a un altro
+    bool operator<=(const Orario& altro) const; //operatore minore o uguale
+    bool operator>(const Orario& altro) const; //operatore maggiore
+    bool operator>=(const Orario& altro) const; //operatore maggiore o uguale
+    bool operator==(const Orario& altro) const; //operatore uguale uguale: confronta se due orari sono identici
+    bool operator!=(const Orario& altro) const; //operatore diverso da
+    Orario operator+(const Orario& altro) const; //operatore somma tra due orari (es. 02:30 + 01:15 = 03:45)
+    int diffInMinuti(const Orario& altro) const; //calcola differenza in minuti tra orario corrente e un altro orario
+    string toString() const; //ritorna rappresentazione stringa dell'orario nel formato "HH:MM"
+    bool isDentroIntervallo(const Orario& inizio, const Orario& fine) const; //verifica se l'orario è compreso tra due orari dati
+    string format() const; //ritorna stringa in formato orario
 };
-
 #endif // ORARIO_H

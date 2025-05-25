@@ -5,51 +5,30 @@
 #include "Orario.h"
 using namespace std;
 
-class Impianto {
+class Impianto { //classe base per rappresentare un impianto
 protected:
-    int id;
-    string nome;
-    bool attivo;
-    Orario ultimaAttivazione;
-    float consumoPerMinuto; // consumo d'acqua in litri per minuto
-    float consumoTotale;    // consumo totale dall'inizio
-    
+    int id; //ID univoco dell’impianto
+    string nome; //nome dell’impianto
+    bool attivo; //stato (attivo/disattivo)
+    Orario ultimaAttivazione; //orario ultima attivazione
+    float consumoPerMinuto; //consumo in litri per ogni minuto di funzionamento
+    float consumoTotale; //consumo totale accumulato
+    void aggiornaConsumo(int minutiAttivi); //metodo per aggiornare il consumo totale dato un tempo di attività
 public:
-    // Costruttore
-    Impianto(int id, const string& nome, float consumoPerMinuto);
-    
-    // Distruttore virtuale
-    virtual ~Impianto() = default;
-    
-    // Metodi accessori
-    int getId() const;
-    string getNome() const;
-    bool isAttivo() const;
-    Orario getUltimaAttivazione() const;
-    float getConsumoTotale() const;
-    
-    // Metodi per attivare/disattivare l'impianto
-    virtual bool accendi(const Orario& orarioCorrente);
-    virtual bool spegni(const Orario& orarioCorrente);
-    
-    // Metodo per impostare il timer (diverso per i vari tipi di impianti)
-    virtual bool impostaTimer(const Orario& inizio, const Orario& fine) = 0;
-    virtual bool impostaTimer2(const Orario& inizio) = 0;
-    // Metodo per rimuovere il timer
-    virtual bool rimuoviTimer() = 0;
-    
-    // Metodo per aggiornare lo stato in base all'orario corrente
-    virtual void aggiornaStato(const Orario& orarioPrecedente, const Orario& orarioCorrente) = 0;
-    
-    // Metodo per ottenere informazioni sull'impianto
-    virtual string getInfo() const = 0;
-    
-    // Factory method per creare nuovi impianti
-    static Impianto* creaImpianto(int id, const string& tipo, const string& nome);
-    
-protected:
-    // Metodo per aggiornare il consumo
-    void aggiornaConsumo(int minutiAttivi);
+    Impianto(int id, const string& nome, float consumoPerMinuto); //costruttore che accetta ID, nome e consumo per minuto
+    virtual ~Impianto() = default; //distruttore virtuale
+    int getId() const; //metodo per restituire ID dell’impianto
+    string getNome() const; //per estituire il nome
+    bool isAttivo() const; //true se è attivo
+    Orario getUltimaAttivazione() const; //orario dell’ultima attivazione
+    float getConsumoTotale() const; //consumo totale
+    virtual bool accendi(const Orario& orarioCorrente); //accende l’impianto
+    virtual bool spegni(const Orario& orarioCorrente); //e lo spegne
+    virtual bool impostaTimer(const Orario& inizio, const Orario& fine) = 0; //imposta un timer (puro, ogni  impianto lo implementa a modo suo)
+    virtual bool impostaTimer2(const Orario& inizio) = 0; //alternativa per impostare timer (solo inizio)
+    virtual bool rimuoviTimer() = 0; //rimuove il timer
+    virtual void aggiornaStato(const Orario& orarioPrecedente, const Orario& orarioCorrente) = 0; //aggiorna stato impianto in base all’orario
+    virtual string getTipo() const = 0; //restituisce informazioni impianto in formato stringa
+    static Impianto* creaImpianto(int id, const string& tipo, const string& nome); //metodo statico per creare un nuovo impianto di tipo specificato
 };
-
 #endif // IMPIANTO_H
