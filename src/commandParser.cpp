@@ -1,3 +1,4 @@
+//FILE AUTHOR: DALLA SANTA MANUEL
 #include <iostream>
 #include <sstream>
 #include <fstream>
@@ -15,6 +16,7 @@ void logMessage(const Orario &time, const string &message, const int &errorLevel
     }
     ofstream logFile("log.txt", ios::app); //apre il file log.txt in modalità append
     if (logFile.is_open()) { //se il file è stato aperto correttamente
+        logFile << "\n========NUOVA SIMULAZIONE========"  << endl;
         string levelString = (errorLevel == 0) ? "INFO" : "ERROR"; //imposta il tipo di log
         logFile << "[" << time.toString() << "] [" << levelString << "] " << message << endl; //scrive il messaggio sul file
         logFile.close(); //chiude il file

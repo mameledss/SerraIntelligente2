@@ -1,3 +1,4 @@
+//AUTHOR: BRUNELLO
 #include <cstdlib>
 #include <ctime>
 #include "ImpiantoMediterraneo.h"

@@ -1,3 +1,4 @@
+//AUTHOR: GITARIC
 #include "CommandParser.h"
 #include "ImpiantoAlpino.h"
 
