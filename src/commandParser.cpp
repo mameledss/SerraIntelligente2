@@ -7,22 +7,29 @@
 
 CommandParser::CommandParser(Serra& serra) : serra(serra) {} //costruttore che inizializza il riferimento alla serra
 
-void logMessage(const Orario &time, const string &message, const int &errorLevel) { //funzione per stampare messaggi con livello di errore
-    if (errorLevel == 0) //se è un messaggio informativo
-        cout << "[" << time.toString() << "] " << message << endl; //scrive con cout
-    else if (errorLevel == 1) { //se è un messaggio di errore
-        cout.flush(); //svuota il buffer
-        cerr << "[" << time.toString() << "] " << message << endl; //scrive con cerr
+void logMessage(const Orario &time, const string &message, const int &errorLevel) {
+    static bool firstCall = true; // variabile statica che mantiene il valore tra le chiamate
+
+    if (errorLevel == 0)
+        cout << "[" << time.toString() << "] " << message << endl;
+    else if (errorLevel == 1) {
+        cout.flush();
+        cerr << "[" << time.toString() << "] " << message << endl;
     }
-    ofstream logFile("log.txt", ios::app); //apre il file log.txt in modalità append
-    if (logFile.is_open()) { //se il file è stato aperto correttamente
-        logFile << "\n========NUOVA SIMULAZIONE========"  << endl;
-        string levelString = (errorLevel == 0) ? "INFO" : "ERROR"; //imposta il tipo di log
-        logFile << "[" << time.toString() << "] [" << levelString << "] " << message << endl; //scrive il messaggio sul file
-        logFile.close(); //chiude il file
-    } else //altrimenti
-        cerr << "Errore: impossibile aprire il file di log" << endl; //mostra errore se il file non si apre
+
+    ofstream logFile("log.txt", ios::app);
+    if (logFile.is_open()) {
+        if (firstCall) { // solo alla prima chiamata
+            logFile << "\n========NUOVA SIMULAZIONE========" << endl;
+            firstCall = false; // imposta a false per le chiamate successive
+        }
+
+        string levelString = (errorLevel == 0) ? "INFO" : "ERROR";
+        logFile << "[" << time.toString() << "] [" << levelString << "] " << message << endl;
+        logFile.close();
+    }
 }
+
 
 bool CommandParser::elaboraComando(const string& comandoCompleto) { //elabora un comando ricevuto in formato stringa
     vector<string> tokens = tokenizzaComando(comandoCompleto); //divide il comando in parole (token)
